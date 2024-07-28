@@ -1,14 +1,15 @@
-from graphbook.steps import BatchStep, SourceStep
+from graphbook.steps import BatchStep
 from graphbook.resources import Resource
 from graphbook import Note
 from transformers import AutoModelForImageSegmentation
 import torchvision.transforms.functional as F
 import torch.nn.functional
 import torch
-from typing import List
+from typing import List, Tuple
 from PIL import Image
 import os
 import os.path as osp
+
 
 class RMBGModel(Resource):
     Category = "Custom"
@@ -41,6 +42,9 @@ class RemoveBackground(BatchStep):
             "type": "string",
             "default": "image",
         },
+        "output_dir": {
+            "type": "string",
+        },
     }
     Outputs = ["out"]
     Category = "Custom"
@@ -51,10 +55,16 @@ class RemoveBackground(BatchStep):
         logger,
         batch_size,
         item_key,
+        output_dir,
         model: AutoModelForImageSegmentation,
     ):
         super().__init__(id, logger, batch_size, item_key)
         self.model = model
+        self.output_dir = output_dir
+        os.makedirs(output_dir, exist_ok=True)
+
+    def on_start(self):
+        torch.cuda.empty_cache()
 
     @staticmethod
     def load_fn(item: dict) -> torch.Tensor:
@@ -68,9 +78,15 @@ class RemoveBackground(BatchStep):
         return image
 
     @staticmethod
-    def dump_fn(t: torch.Tensor, output_dir: str, uid: int):
+    def dump_fn(data: Tuple[torch.Tensor, str]):
+        t, output_path = data
+        dir = osp.dirname(output_path)
+        os.makedirs(dir, exist_ok=True)
         img = F.to_pil_image(t)
-        img.save(osp.join(output_dir, f"{uid}.png"))
+        img.save(output_path)
+
+    def get_output_path(self, note, input_path):
+        return osp.join(self.output_dir, note["name"], osp.basename(input_path))
 
     @torch.no_grad()
     def on_item_batch(
@@ -101,34 +117,19 @@ class RemoveBackground(BatchStep):
                     torch.unsqueeze(image, 0), size=og_size, mode="bilinear"
                 ),
                 0,
-            )
+            ).cpu()
             for image, og_size in zip(result, og_sizes)
         ]
-        return {"removed_bg": resized}
+        paths = [
+            self.get_output_path(note, input["value"])
+            for input, note in zip(items, notes)
+        ]
+        removed_bg = list(zip(resized, paths))
+        for path, note in zip(paths, notes):
+            masks = note["masks"]
+            if masks is None:
+                masks = []
+            masks.append({"value": path, "type": "image"})
+            note["masks"] = masks
 
-class LoadImageDataset(SourceStep):
-    RequiresInput = False
-    Outputs = ["out"]
-    Category = "Custom"
-    Parameters = {"image_dir": {"type": "string", "default": "/data/pokemon"}}
-
-    def __init__(self, id, logger, image_dir: str):
-        super().__init__(id, logger)
-        self.image_dir = image_dir
-
-    def load(self):
-        subdirs = os.listdir(self.image_dir)
-
-        def create_note(subdir):
-            image_dir = osp.join(self.image_dir, subdir)
-            return Note(
-                {
-                    "name": subdir,
-                    "image": [
-                        {"value": osp.join(image_dir, img), "type": "image"}
-                        for img in os.listdir(image_dir)
-                    ],
-                }
-            )
-
-        return {"out": [create_note(subdir) for subdir in subdirs]}
+        return {"removed_bg": removed_bg}

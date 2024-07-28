@@ -9,6 +9,7 @@ import torchvision.transforms.functional as F
 from PIL import Image
 from typing import List
 
+
 class PokemonClassifier(BatchStep):
     RequiresInput = True
     Parameters = {
@@ -31,7 +32,7 @@ class PokemonClassifier(BatchStep):
         batch_size,
         item_key,
         model: ViTForImageClassification,
-        image_processor: ViTImageProcessor
+        image_processor: ViTImageProcessor,
     ):
         super().__init__(id, logger, batch_size, item_key)
         self.model = model
@@ -95,27 +96,31 @@ class LoadImageDataset(SourceStep):
 
         return {"out": [create_note(subdir) for subdir in subdirs]}
 
+
 class ViTForImageClassificationResource(Resource):
     Category = "Huggingface/Transformers"
     Parameters = {
         "model_name": {
             "type": "string",
-            "description": "The name of the model to load."
+            "description": "The name of the model to load.",
         }
     }
+
     def __init__(self, model_name: str):
         self.model = ViTForImageClassification.from_pretrained(model_name)
-        self.model = self.model.to('cuda')
+        self.model = self.model.to("cuda")
         super().__init__(self.model)
-        
+
+
 class ViTImageProcessorResource(Resource):
     Category = "Huggingface/Transformers"
     Parameters = {
         "image_processor": {
             "type": "string",
-            "description": "The name of the image processor."
+            "description": "The name of the image processor.",
         }
     }
+
     def __init__(self, image_processor: str):
         self.image_processor = ViTImageProcessor.from_pretrained(image_processor)
         super().__init__(self.image_processor)
