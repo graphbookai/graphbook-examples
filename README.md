@@ -10,8 +10,12 @@ This project is a collection of example workflows and custom nodes for [Graphboo
 To use the examples in this project, follow these steps:
 
 1. Clone the repository.
-1. Navigate to your example directory of choice. The top level directories are the examples to choose from.
-1. Run graphbook from that directory.
+1. Choose whichever example directory you want to run.
+1. Run graphbook with:
+
+```bash
+graphbook --workflow_dir <EXAMPLE_DIR> --nodes_dir <EXAMPLE_DIR>/custom_nodes/
+```
 
 ## Contributing
 
