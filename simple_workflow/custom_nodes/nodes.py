@@ -4,6 +4,12 @@ import random
 
 
 class MyFirstStep(Step):
+    """
+    This is a custom step that randomly forwards the input to either A or B given the probability `prob`.
+    
+    Args:
+        prob (float): The probability of forwarding the input to A.
+    """
     RequiresInput = True
     Parameters = {"prob": {"type": "resource"}}
     Outputs = ["A", "B"]
@@ -26,6 +32,12 @@ from graphbook.steps import SourceStep
 
 
 class MyFirstSource(SourceStep):
+    """
+    This is a custom source step that creates 10 notes with the same message.
+    
+    Args:
+        message (str): The message to be used in the notes
+    """
     RequiresInput = False
     Parameters = {"message": {"type": "string", "default": "Hello, World!"}}
     Outputs = ["message"]

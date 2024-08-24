@@ -14,7 +14,7 @@ To use the examples in this project, follow these steps:
 1. Run graphbook with:
 
 ```bash
-graphbook --workflow_dir <EXAMPLE_DIR> --nodes_dir <EXAMPLE_DIR>/custom_nodes/
+graphbook --root_dir <EXAMPLE_DIR>
 ```
 
 ## Contributing

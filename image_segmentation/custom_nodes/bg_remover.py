@@ -12,6 +12,13 @@ import os.path as osp
 
 
 class RMBGModel(Resource):
+    """
+    The RMBGModel resource is used to load a model for removing the background from images.
+    
+    Args:
+        model_name (str): The name of the model from Huggingface.
+    """
+
     Category = "Custom"
     Parameters = {
         "model_name": {
@@ -29,6 +36,16 @@ class RMBGModel(Resource):
 
 
 class RemoveBackground(BatchStep):
+    """
+    The background remover step uses the input model to remove the background from images.
+    
+    Args:
+        batch_size (int): The batch size for the model.
+        item_key (str): The key to use for the image in the input Note.
+        model (AutoModelForImageSegmentation): The model to use for background removal.
+        output_dir (str): The directory to save the output images.
+    """
+
     RequiresInput = True
     Parameters = {
         "model": {

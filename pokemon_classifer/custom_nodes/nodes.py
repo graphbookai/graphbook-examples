@@ -11,6 +11,16 @@ from typing import List
 
 
 class PokemonClassifier(BatchStep):
+    """
+    The PokemonClassifier step uses the input Vision Transformer model and image processor to classify incoming images of Pokemon.
+
+    Args:
+        batch_size (int): The batch size for the model.
+        item_key (str): The key to use for the image in the input Note.
+        model (ViTForImageClassification): The Vision Transformer model to use for classification.
+        image_processor (ViTImageProcessor): The image processor to use for the model
+    """
+
     RequiresInput = True
     Parameters = {
         "batch_size": {"type": "number", "default": 8},
@@ -70,6 +80,13 @@ class PokemonClassifier(BatchStep):
 
 
 class LoadImageDataset(SourceStep):
+    """
+    Loads a dataset of images from a directory.
+
+    Args:
+        image_dir (str): The directory containing the images
+    """
+
     RequiresInput = False
     Outputs = ["out"]
     Category = "Custom"
@@ -98,6 +115,13 @@ class LoadImageDataset(SourceStep):
 
 
 class ViTForImageClassificationResource(Resource):
+    """
+    A resource that loads a Vision Transformer model for image classification.
+
+    Args:
+        model_name (str): The name of the model to load taken from Huggingface's model hub.
+    """
+
     Category = "Huggingface/Transformers"
     Parameters = {
         "model_name": {
@@ -113,6 +137,13 @@ class ViTForImageClassificationResource(Resource):
 
 
 class ViTImageProcessorResource(Resource):
+    """
+    A resource that loads the corresponding image processor.
+
+    Args:
+        image_processor (str): The name of the image processor taken from Huggingface's model hub. This is typically the same as the model name.
+    """
+
     Category = "Huggingface/Transformers"
     Parameters = {
         "image_processor": {

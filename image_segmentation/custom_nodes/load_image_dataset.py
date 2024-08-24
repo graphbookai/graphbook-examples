@@ -6,6 +6,13 @@ import os.path as osp
 
 
 class LoadImageDataset(SourceStep):
+    """
+    Loads a dataset of images from a directory.
+
+    Args:
+        image_dir (str): The directory containing the images
+    """
+
     RequiresInput = False
     Outputs = ["out"]
     Category = "Custom"
