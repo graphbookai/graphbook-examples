@@ -149,4 +149,4 @@ class RemoveBackground(BatchStep):
             masks.append({"value": path, "type": "image"})
             note["masks"] = masks
 
-        return {"removed_bg": removed_bg}
+        return removed_bg
