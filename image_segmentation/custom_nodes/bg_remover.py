@@ -68,14 +68,12 @@ class RemoveBackground(BatchStep):
 
     def __init__(
         self,
-        id,
-        logger,
         batch_size,
         item_key,
         output_dir,
         model: AutoModelForImageSegmentation,
     ):
-        super().__init__(id, logger, batch_size, item_key)
+        super().__init__(batch_size, item_key)
         self.model = model
         self.output_dir = output_dir
         os.makedirs(output_dir, exist_ok=True)
@@ -95,8 +93,7 @@ class RemoveBackground(BatchStep):
         return image
 
     @staticmethod
-    def dump_fn(data: Tuple[torch.Tensor, str]):
-        t, output_path = data
+    def dump_fn(t: torch.Tensor, output_path: str):
         dir = osp.dirname(output_path)
         os.makedirs(dir, exist_ok=True)
         img = F.to_pil_image(t)

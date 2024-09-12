@@ -18,8 +18,8 @@ class LoadImageDataset(SourceStep):
     Category = "Custom"
     Parameters = {"image_dir": {"type": "string", "default": "/data/pokemon"}}
 
-    def __init__(self, id, logger, image_dir: str):
-        super().__init__(id, logger)
+    def __init__(self, image_dir: str):
+        super().__init__()
         self.image_dir = image_dir
 
     def load(self):

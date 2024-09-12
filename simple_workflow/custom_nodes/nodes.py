@@ -15,12 +15,12 @@ class MyFirstStep(Step):
     Outputs = ["A", "B"]
     Category = "Custom"
 
-    def __init__(self, id, logger, prob):
-        super().__init__(id, logger)
+    def __init__(self, prob):
+        super().__init__()
         self.prob = prob
 
     def on_after_items(self, note: Note) -> Note:
-        self.logger.log(note["message"])
+        self.log(note["message"])
 
     def forward_note(self, note: Note) -> str:
         if random.random() < self.prob:
@@ -43,8 +43,8 @@ class MyFirstSource(SourceStep):
     Outputs = ["message"]
     Category = "Custom"
 
-    def __init__(self, id, logger, message):
-        super().__init__(id, logger)
+    def __init__(self, message):
+        super().__init__()
         self.message = message
 
     def load(self):

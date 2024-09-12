@@ -37,14 +37,12 @@ class PokemonClassifier(BatchStep):
 
     def __init__(
         self,
-        id,
-        logger,
         batch_size,
         item_key,
         model: ViTForImageClassification,
         image_processor: ViTImageProcessor,
     ):
-        super().__init__(id, logger, batch_size, item_key)
+        super().__init__(batch_size, item_key)
         self.model = model
         self.image_processor = image_processor
         self.tp = 0
@@ -71,12 +69,12 @@ class PokemonClassifier(BatchStep):
         predicted_id = self.model(**extracted).logits.argmax(-1)
         for t, item, note in zip(predicted_id, items, notes):
             item["prediction"] = self.model.config.id2label[t.item()]
-            self.logger.log(f"Predicted {item['value']} as {item['prediction']}")
+            self.log(f"Predicted {item['value']} as {item['prediction']}")
             if item["prediction"] == note["name"]:
                 self.tp += 1
             self.num_samples += 1
         if self.num_samples > 0:
-            self.logger.log(f"Accuracy: {self.tp/self.num_samples:.2f}")
+            self.log(f"Accuracy: {self.tp/self.num_samples:.2f}")
 
 
 class LoadImageDataset(SourceStep):
@@ -92,8 +90,8 @@ class LoadImageDataset(SourceStep):
     Category = "Custom"
     Parameters = {"image_dir": {"type": "string", "default": "/data/pokemon"}}
 
-    def __init__(self, id, logger, image_dir: str):
-        super().__init__(id, logger)
+    def __init__(self, image_dir: str):
+        super().__init__()
         self.image_dir = image_dir
 
     def load(self):
